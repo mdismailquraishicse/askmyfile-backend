@@ -1,4 +1,4 @@
-from providers.huggingface_provider import HuggingFaceLLMProvider
+from llm.providers.huggingface_provider import HuggingFaceLLMProvider
 
 
 
