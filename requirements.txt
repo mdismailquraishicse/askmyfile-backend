@@ -1,3 +1,6 @@
+websockets==16.0
+fastapi==0.136.3
+uvicorn==0.48.0
 pypdf==6.12.1
 qdrant-client==1.18.0
 sentence-transformers==5.3.0
