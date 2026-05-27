@@ -75,3 +75,12 @@ class AskMyFileService:
             "answer": answer,
             "context": context
         }
+    
+
+    def create_collection(self, collection_name:str):
+
+        return ask_my_file_db.create_collection(collection_name = collection_name)
+
+    def delete_collection(self, collection_name:str):
+
+        return ask_my_file_db.delete_collection(collection_name = collection_name)

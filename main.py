@@ -1,33 +1,60 @@
-import os
-from dotenv  import load_dotenv
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_huggingface.embeddings import HuggingFaceEmbeddings
-from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-load_dotenv()
-HUGGINGFACEHUB_API_TOKEN=os.getenv("HUGGINGFACEHUB_API_TOKEN")
+import shutil
+import uvicorn
+from fastapi import FastAPI, WebSocket, File, UploadFile
+from starlette.websockets import WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from services.ask_my_file_services import AskMyFileService
 
 
-repo_id = "Qwen/Qwen2.5-72B-Instruct"
+
+app = FastAPI()
+askmyfile_service = AskMyFileService()
+sockets : set[WebSocket] = set()
+collection_name = "my_collection"
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = ["*"],
+    allow_credentials=True,
+    allow_methods = ["*"],
+    allow_headers = ["*"]
+)
 
 
-loader = PyPDFLoader("mongodb.pdf")
-docs = loader.load()
-print(f"docs: {docs}")
+@app.post("/upload-file")
+def upload_file(file: UploadFile = File(...)):
 
-def ask_llm(query:str, context:str = None):
+    print(f"filename: {file.filename}")
+    file_path = "uploads/file.filename"
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
 
-    endpoint = HuggingFaceEndpoint(
-            huggingfacehub_api_token = HUGGINGFACEHUB_API_TOKEN,
-            repo_id = repo_id,
-            temperature = 0.5,
-            max_new_tokens = 1024
-        )
-    
-    llm = ChatHuggingFace(llm=endpoint)
-    response = llm.invoke(query)
-    return response.content
+    askmyfile_service.delete_collection(collection_name = collection_name)
+    askmyfile_service.create_collection(collection_name = collection_name)
+    askmyfile_service.upsert_embeddings_to_vector_db(path = file_path, collection_name = collection_name)
+
+@app.websocket("/ask")
+async def ask(websocket: WebSocket):
+
+    try:
+        sockets.add(websocket)
+        await websocket.accept()
+        while True:
+            query = await websocket.receive_text()
+            print(f"text recieved: {query}")
+            # await websocket.send_json({"answer": "answer", "context": "context"})
+            response = askmyfile_service.invoke_llm(query = query)
+            print(f"response: {response}")
+            await websocket.send_json(response)
+    except WebSocketDisconnect as wsd:
+        print(f"Websocket disconnected : {wsd}")
+        sockets.remove(websocket)
 
 
-# print(ask_llm("generate a poem on sex"))
+if __name__ == "__main__":
+
+    uvicorn.run(
+        app,
+        host = "0.0.0.0",
+        port = 8000
+    )
