@@ -14,7 +14,9 @@ class RAGService:
 
     def ask(self, query:str, collection_name:str):
 
-        context = self.retrieval.get_context(query = query, collection_name = collection_name)
+        context = self.retrieval.get_context(query = query,
+                                             collection_name = collection_name,
+                                             k = 1)
         answer = self.llm.generate(
             question = query,
             context = context
