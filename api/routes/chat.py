@@ -1,3 +1,4 @@
+from core.logger import logger
 from fastapi import WebSocket, APIRouter
 from starlette.websockets import WebSocketDisconnect
 from services.rag_service import RAGService
@@ -18,17 +19,17 @@ async def ask(websocket: WebSocket):
         sockets.add(websocket)
         while True:
             query = await websocket.receive_text()
-            print(f"text received: {query}")
+            logger.info(f"text received: {query}")
             # await websocket.send_json({"answer": "answer", "context": "context"})
             response = rag.ask(query = query, collection_name = collection_name)
-            print(f"response: {response}")
+            logger.info(f"response: {response}")
             await websocket.send_json(response)
 
     except WebSocketDisconnect as wsd:
-        print(f"Websocket disconnected : {wsd}")
+        logger.error(f"Websocket disconnected : {wsd}")
 
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
 
         await websocket.send_json({
             "error": str(e)

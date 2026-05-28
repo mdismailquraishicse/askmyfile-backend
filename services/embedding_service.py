@@ -1,3 +1,4 @@
+from core.logger import logger
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
@@ -23,7 +24,7 @@ class EmbeddingService:
 
         documents = loader.load()
         chunks = splitter.split_documents(documents = documents)
-        print(f"Document breaked into {len(chunks)} chunks")
+        logger.info(f"Document breaked into {len(chunks)} chunks")
         return chunks
     
 

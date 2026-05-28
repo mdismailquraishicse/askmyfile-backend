@@ -1,3 +1,4 @@
+from core.logger import logger
 from core.config import settings
 from services.embedding_service import EmbeddingService
 from db.qdrant_db import VectorDB
@@ -22,7 +23,7 @@ class IngestionService:
         upserted = self.db.upsert_to_db(embeddings = embeddings,
                              payload = text,
                              collection_name = collection_name)
-        print(f"data upserted successfully")
+        logger.info(f"data upserted successfully")
         return upserted
     
 

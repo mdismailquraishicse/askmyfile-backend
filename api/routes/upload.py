@@ -1,5 +1,6 @@
 import os
 import shutil
+from core.logger import logger
 from fastapi import File, UploadFile, APIRouter
 from services.ingestion_service import IngestionService
 
@@ -12,7 +13,7 @@ collection_name = "my_collection"
 @router.post("/file")
 def upload_file(file: UploadFile = File(...)):
 
-    print(f"filename: {file.filename}")
+    logger.info(f"filename: {file.filename}")
     os.makedirs("uploads", exist_ok=True)
     file_path = f"uploads/{file.filename}"
     with open(file_path, "wb") as buffer:
