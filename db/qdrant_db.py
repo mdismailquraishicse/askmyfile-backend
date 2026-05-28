@@ -45,8 +45,7 @@ class VectorDB:
                     payload = {"text" : payload[i]}
                 )]
             )
-        
-        print(f"data upserted successfully")
+
         return True
     
 

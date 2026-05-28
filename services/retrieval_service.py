@@ -1,4 +1,4 @@
-import os
+from core.config import settings
 from db.qdrant_db import VectorDB
 from services.embedding_service import EmbeddingService
 
@@ -11,8 +11,8 @@ class RetrievalService:
     def __init__(self):
         
         self.embedding_service = EmbeddingService()
-        self.db = VectorDB(host=os.getenv("HOST", "localhost"),
-                           port=os.getenv("PORT", 6333))
+        self.db = VectorDB(host = settings.QDRANT_HOST,
+                           port = settings.QDRANT_PORT)
 
 
     def get_context(self, query:str, collection_name:str, k:int):

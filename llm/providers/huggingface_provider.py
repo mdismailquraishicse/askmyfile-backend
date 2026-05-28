@@ -1,10 +1,7 @@
-import os
-from dotenv import load_dotenv
+from core.config import settings
 from llm.providers.base import BaseLLMProvider
 from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 
-
-load_dotenv()
 
 
 class HuggingFaceLLMProvider(BaseLLMProvider):
@@ -13,10 +10,12 @@ class HuggingFaceLLMProvider(BaseLLMProvider):
     def __init__(self):
         
         endpoint = HuggingFaceEndpoint(
-            huggingfacehub_api_token = os.getenv("HUGGINGFACEHUB_API_TOKEN"),
-            repo_id = os.getenv("REPO_ID", "Qwen/Qwen2.5-72B-Instruct"),
-            temperature = os.getenv("TEMPERATURE", 0.5),
-            max_new_tokens = os.getenv("MAX_NEW_TOKENS", 200)
+            huggingfacehub_api_token = settings.HUGGINGFACEHUB_API_TOKEN,
+            repo_id = settings.MODEL_NAME,
+            temperature = settings.TEMPERATURE,
+            top_k = settings.TOP_K,
+            top_p = settings.TOP_P,
+            max_new_tokens = settings.MAX_NEW_TOKENS
         )
 
         self.llm = ChatHuggingFace(llm = endpoint)
