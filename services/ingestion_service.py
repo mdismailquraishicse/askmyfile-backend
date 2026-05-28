@@ -25,3 +25,13 @@ class IngestionService:
                              collection_name = collection_name)
         print(f"data upserted successfully")
         return upserted
+    
+
+    def delete_collection(self, collection_name:str):
+
+        self.db.delete_collection(collection_name = collection_name)
+
+
+    def create_collection(self, collection_name:str):
+
+        self.db.create_collection(collection_name = collection_name)
