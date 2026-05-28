@@ -2,7 +2,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, Distance, VectorParams
 
 
-class AskMyFileDB:
+class VectorDB:
 
 
     def __init__(self, host:str, port:int):
